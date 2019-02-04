@@ -1,4 +1,4 @@
-FROM kjjuno/dev:mono
+FROM kjjuno/dev-mono:latest
 
 # dotnet core 2.2
 RUN wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb
