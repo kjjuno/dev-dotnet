@@ -36,7 +36,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'editorconfig/editorconfig-vim'
 Plugin 'kien/ctrlp.vim'          " Best used with ctags, install at terminal
-Bundle 'OmniSharp/omnisharp-vim' " Omnisharp integration for csharp support
+Bundle 'OmniSharp/omnisharp-vim'
 
 call vundle#end()                " required
 filetype plugin indent on        " required
@@ -55,8 +55,7 @@ set tags=tags;
 
 "////////////////////////////
 "// Omnisharp-vim
-let g:OmniSharp_server_use_mono = 1
-let g:OmniSharp_server_path = '/root/.omnisharp/omnisharp/OmniSharp.exe'
+let g:OmniSharp_server_path = '/root/.omnisharp/run'
 
 " Set the type lookup function to use the preview window instead of echoing it
 "let g:OmniSharp_typeLookupInPreview = 1
