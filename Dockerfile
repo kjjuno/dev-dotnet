@@ -1,31 +1,20 @@
-FROM kjjuno/dev:latest
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2
 
-COPY vimrc.vim /root/.vimrc
+ENV DEBIAN_FRONTEND=noninteractive
+ENV MONO_VERSION 6.0.0.313
 
-ENV OMNISHARP_VERSION=v1.32.1 \
-    OMNISHARP_FILE=omnisharp.http-linux-x64.tar.gz
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends gnupg dirmngr wget \
+  && export GNUPGHOME="$(mktemp -d)" \
+  && gpg --batch --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF \
+  && gpg --batch --export --armor 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF > /etc/apt/trusted.gpg.d/mono.gpg.asc \
+  && gpgconf --kill all \
+  && rm -rf "$GNUPGHOME" \
+  && apt-key list | grep Xamarin \
+  && apt-get purge -y --auto-remove gnupg dirmngr
 
-ENV OMNISHARP_URL=https://github.com/OmniSharp/omnisharp-roslyn/releases/download/$OMNISHARP_VERSION/$OMNISHARP_FILE \
-    # Enable detection of running in a container
-    DOTNET_RUNNING_IN_CONTAINER=true \
-    # Enable correct mode for dotnet watch (only mode supported in a container)
-    DOTNET_USE_POLLING_FILE_WATCHER=true \
-    # Opt out of telemetry
-    DOTNET_CLI_TELEMETRY_OPTOUT=true
+RUN echo "deb http://download.mono-project.com/repo/debian stable-stretch/snapshots/$MONO_VERSION main" > /etc/apt/sources.list.d/mono-official-stable.list \
+  && apt-get update \
+  && apt-get install -y mono-complete
 
-# vim plugins and dotnet core 2.2
-RUN vim +PluginInstall +qall && \
-    wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb && \
-    apt-get install -y apt-transport-https && \
-    apt-get update && \
-    apt-get install -y dotnet-sdk-2.2 libuv1-dev && \
-    dotnet help
-
-# Omnisharp Server
-RUN wget -q $OMNISHARP_URL && \
-    mkdir -p /root/.omnisharp && \
-    tar xvzf $OMNISHARP_FILE -C /root/.omnisharp && \
-    rm $OMNISHARP_FILE
-
+ENV DEBIAN_FRONTEND=
